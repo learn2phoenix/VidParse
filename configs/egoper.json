@@ -1,0 +1,93 @@
+{
+  "_note": "Reproduces the EgoPER columns of Tables 1-3: Acc 80.69, Edit 88.69, F1@{.1,.25,.5} 91.14 / 88.53 / 77.61 over the 53 test videos, and the 'Ours + DINO MAFs' row of Table 2 per recipe.",
+  "dataset": "egoper",
+  "fps": 10.0,
+  "recipes": [
+    "quesadilla",
+    "coffee",
+    "tea",
+    "pinwheels",
+    "oatmeal"
+  ],
+  "output_dir": "./runs/egoper",
+  "distance_metric": "cosine",
+  "drop_penalty": 0.1,
+  "data": {
+    "root": "/path/to/EGOPER",
+    "annotations": "annotation.json",
+    "features": ".",
+    "detections": "hod",
+    "videos": "Videos",
+    "train_list": "splits/combined_train.txt",
+    "test_list": "splits/combined_test.txt"
+  },
+  "features": {
+    "name": "feats_dinov2_hod_enclosed_10fps",
+    "_backbone": "DINOv2 ViT-L/14, patch tokens averaged inside the hand-object interaction box (Manipulation-Anchored Features)"
+  },
+  "boundary": {
+    "method": "tsme",
+    "kernel_seconds": 2.0,
+    "peak_height": 9.0,
+    "min_distance": 20,
+    "_note": "Online TSM boundary detector. kernel_seconds is the checkerboard kernel half-width; multiplied by fps it gives the kernel in frames. peak_height is the novelty threshold for calling a peak a boundary. min_distance is the minimum gap d between boundaries, in frames -- the d swept in Table 4(c). In the paper all three were constants in the source rather than settings."
+  },
+  "prototypes": {
+    "num_clusters": 9,
+    "proto_type": "kmeans",
+    "micro": true,
+    "micro_duration_seconds": 4.0,
+    "micro_stride_seconds": 2.0,
+    "conf_thresh": 0.75,
+    "_note": "num_clusters is the number of prototypes per action class. proto_type selects centroids ('kmeans', used in the paper), 'medoid', or 'global_mean'. micro_* slice each cluster into overlapping windows, in seconds. seed is the k-means seed; 42 is the published run, and the spread over other seeds is about 0.6 accuracy, so treat smaller differences as noise.",
+    "seed": 42
+  },
+  "scoring": {
+    "k": 8,
+    "avg_top_n": 1,
+    "segment_duration": 3.0,
+    "conf_thresh": 0.75,
+    "_note": "segment_duration is the scoring window in seconds; k and avg_top_n control how many prototype matches are pooled per segment."
+  },
+  "decoding": {
+    "use_graph": true,
+    "transition_weight": 0,
+    "duration_weight": 0,
+    "beam_width": 10,
+    "segment_duration": 3.0,
+    "blank_penalty": 100,
+    "continuation_bonus": 0.0,
+    "continuation_penalty": 0.0,
+    "short_duration_penalty": 0.0,
+    "temporal_offset_penalty": 0.0,
+    "transition_penalty": 0.0,
+    "good_match_sigma": 1.0,
+    "continuation_sigma_multiplier": 1,
+    "cost_function": "raw",
+    "pruning_metric": "ranking_score",
+    "ignore_history": false,
+    "force_distinct_actions": false,
+    "mask_lambda": 1.0,
+    "bg_alpha": 0.0,
+    "conf_thresh": 0.9,
+    "fill_gap": 1.5,
+    "min_duration": 1.0,
+    "bg_suppress_trigger": "Microwave for X seconds",
+    "bg_suppress_trigger_count": 1,
+    "max_graph_hops": 1,
+    "allow_skipping": true,
+    "prereq_miss_penalty": 1.0,
+    "bridge_start": "Put bowl in microwave",
+    "bridge_end": "Remove bowl from microwave",
+    "bridge_fill": "Microwave for X seconds",
+    "bridge_missing_thresh": 0.5,
+    "max_segment_duration": 10.0,
+    "_note": "beam_width is the number of hypotheses kept alive. The five penalty terms are 0.0 in every published run -- note that parse.py's own argparse defaults are NOT zero, so anything invoking it directly must pass them. bg_suppress_trigger and bridge_* name EgoPER actions explicitly and are dataset-specific priors; set them to null to disable."
+  },
+  "eval": {
+    "ignore_action": "BG"
+  },
+  "analyzers": {
+    "ignore_action": "BG"
+  }
+}
