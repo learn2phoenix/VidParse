@@ -1,6 +1,6 @@
 # VidParse: Online Parsing of Egocentric Procedures Like a Pro
 
-[**Anubhav Gupta**](https://github.com/learn2phoenix)<sup>1</sup> · [**Archit Kambhamettu**](TODO-archit-homepage)<sup>1</sup> · [**Vatsal Agarwal**](https://vatsalag99.github.io/)<sup>1</sup> · [**Pulkit Kumar**](https://www.cs.umd.edu/~pulkit/)<sup>1</sup> · [**Abhinav Shrivastava**](http://www.cs.umd.edu/~abhinav/)<sup>1</sup>
+[**Anubhav Gupta**](https://learn2phoenix.github.io)<sup>1</sup> · [**Archit Kambhamettu**](https://architkam.github.io/)<sup>1</sup> · [**Vatsal Agarwal**](https://vatsalag99.github.io/)<sup>1</sup> · [**Pulkit Kumar**](https://www.cs.umd.edu/~pulkit/)<sup>1</sup> · [**Abhinav Shrivastava**](http://www.cs.umd.edu/~abhinav/)<sup>1</sup>
 
 <sup>1</sup>University of Maryland, College Park <br>
 **ECCV 2026** <br>
