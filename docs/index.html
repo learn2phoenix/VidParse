@@ -21,6 +21,15 @@
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
+/* Sections behave as cells: scrolling settles on a block rather than halfway
+   between the video and its beam. `proximity`, never `mandatory` -- Results and
+   the coffee task graph are taller than a viewport, and mandatory snapping
+   fights the reader inside them. */
+@media (min-width:900px) and (min-height:640px){
+  html{scroll-snap-type:y proximity}
+  header,section{scroll-snap-align:start}
+  .cell{scroll-snap-align:center;scroll-margin-top:12px}
+}
 body{margin:0;background:var(--paper);color:var(--body);font-family:var(--sans);
   font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased}
 .wrap{max-width:1020px;margin:0 auto;padding:0 24px}
@@ -53,16 +62,22 @@ header h1{font-family:var(--serif);font-size:clamp(28px,4.6vw,44px);font-weight:
 .viewer{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
 @media(max-width:900px){.viewer{grid-template-columns:1fr}}
 .stage{border:1px solid var(--rule);border-radius:12px;overflow:hidden;background:var(--paper)}
-.stage video{display:block;width:100%;height:auto}
+/* The video renders 1024x718, which at full container width is 682px tall --
+   taller than a laptop viewport once the beam is added, so the beam was always
+   below the fold and the two could never be watched together. Capping by
+   viewport height keeps the pair on screen as one unit. */
+.stage video{display:block;margin:0 auto;width:auto;max-width:100%;
+  height:auto;max-height:min(40vh,560px)}
+.stage{display:flex;align-items:center;justify-content:center;background:var(--tint)}
 .beamwrap{margin-top:26px;border:1px solid var(--rule);border-radius:12px;background:var(--tint);overflow:hidden}
 .beamhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
   padding:13px 16px;background:var(--paper);border-bottom:1px solid var(--rule)}
 .beamhead .k{font-family:var(--mono);font-size:11px;letter-spacing:.11em;
   text-transform:uppercase;color:var(--muted)}
 .beamhead .now{font-weight:700;color:var(--ink);font-size:16px;margin-left:10px}
-.trellis{overflow-x:auto;overflow-y:hidden;padding:14px 16px}
+.trellis{overflow:auto;max-height:min(22vh,300px);padding:12px 16px}
 .trellis svg{display:block}
-.hint{margin:0;padding:0 16px 14px;font-size:13.5px;color:var(--muted)}
+.hint{margin:0;padding:0 16px 12px;font-size:12.5px;color:var(--muted)}
 .beam{border:1px solid var(--rule);border-radius:12px;background:var(--tint);
   display:flex;flex-direction:column;max-height:540px}
 .beam .head{padding:13px 16px;border-bottom:1px solid var(--rule);background:var(--paper);
@@ -139,6 +154,10 @@ td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
 
 pre{background:var(--tint);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;
   overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.7;margin:0;color:var(--body)}
+@media (max-width:899px), (max-height:639px){
+  .stage video{max-height:none;width:100%}
+  .trellis{max-height:none}
+}
 footer{padding:40px 0 64px;border-top:1px solid var(--rule);color:var(--muted);font-size:14.5px}
 </style>
 </head>
@@ -195,6 +214,7 @@ footer{padding:40px 0 64px;border-top:1px solid var(--rule);color:var(--muted);f
     believes it has taken.</p>
 
     <div class="tabs" role="tablist" id="vidtabs"></div>
+    <div class="cell">
     <figure style="margin:0">
       <div class="stage"><video id="qvid" controls muted loop playsinline preload="metadata"></video></div>
       <figcaption id="vidcap"></figcaption>
@@ -212,6 +232,7 @@ footer{padding:40px 0 64px;border-top:1px solid var(--rule);color:var(--muted);f
       <p class="hint">Every column is one emitted segment; every box a live hypothesis, joined to
       the one it extends. The highlighted chain is the surviving best path &mdash; the rest are
       alternatives the graph still permits. Scroll sideways to walk back through the search.</p>
+    </div>
     </div>
   </section>
 
