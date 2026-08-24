@@ -207,11 +207,11 @@ footer{padding:40px 0 64px;border-top:1px solid var(--rule);color:var(--muted);f
 <section id="qualitative">
   <div class="wrap">
     <h2>Watch it parse</h2>
-    <p class="lede">Each clip is a recording of a real run. The video plays as the parser sees it,
-    one frame at a time, never looking ahead. Ground truth is above, the committed parse below;
-    background is dropped from both, so the bars compare directly. The beam on the right follows
-    playback &mdash; scroll it to see every hypothesis still alive and the full path each one
-    believes it has taken.</p>
+    <p class="lede">Each clip is a real run on a test video. The parser gets one frame at a time
+    and never looks ahead. The top bar is ground truth and the bottom bar is the committed parse,
+    with background frames dropped from both so the two line up. The panel on the right shows the
+    beam at the current playhead. Scroll it to see which hypotheses are still alive and what
+    sequence each one has accumulated.</p>
 
     <div class="tabs" role="tablist" id="vidtabs"></div>
     <div class="cell">
@@ -229,9 +229,9 @@ footer{padding:40px 0 64px;border-top:1px solid var(--rule);color:var(--muted);f
         <span class="k" id="beamstep"></span>
       </div>
       <div class="trellis" id="trellis"><svg id="beamsvg"></svg></div>
-      <p class="hint">Every column is one emitted segment; every box a live hypothesis, joined to
-      the one it extends. The highlighted chain is the surviving best path &mdash; the rest are
-      alternatives the graph still permits. Scroll sideways to walk back through the search.</p>
+      <p class="hint">One column per emitted segment, one box per live hypothesis, each joined to
+      the hypothesis it extends. The highlighted chain is the current best path. The remaining
+      boxes are alternatives the graph still allows. Scroll sideways to see earlier segments.</p>
     </div>
     </div>
   </section>
@@ -239,9 +239,9 @@ footer{padding:40px 0 64px;border-top:1px solid var(--rule);color:var(--muted);f
 <section id="method">
   <div class="wrap">
     <h2>Method</h2>
-    <p class="lede">Three pieces, none of them learned. The bet is that a frozen foundation model
-    already sees enough, and what is missing is the right place to look and the right constraint
-    on what can follow what.</p>
+    <p class="lede">The pipeline has three parts and none of them are trained. We keep a frozen
+    backbone and add two things to it: a choice of where in the frame to pool its features, and a
+    constraint on which action sequences the decoder is allowed to produce.</p>
     <figure style="margin:0 0 26px">
       <img src="assets/fig/method.png" alt="The VidParse pipeline" style="width:100%;height:auto;
         border:1px solid var(--rule);border-radius:12px;background:#fff">
@@ -249,23 +249,24 @@ footer{padding:40px 0 64px;border-top:1px solid var(--rule);color:var(--muted);f
     <div class="steps">
       <div class="card">
         <h3>Manipulation-anchored features</h3>
-        <p>A frozen DINOv2 ViT-L/14 gives patch tokens; a frozen hand&ndash;object detector gives
-        the interaction box. We average only the tokens inside it &mdash; training-free masked
-        attention that follows the hands, not the kitchen behind them.</p>
+        <p>A frozen DINOv2 ViT-L/14 gives patch tokens, and a frozen hand&ndash;object detector
+        gives the interaction box. We average only the tokens that fall inside that box, so the
+        descriptor stays on whatever the hands are holding and ignores the rest of the kitchen.</p>
         <span class="kbd">frame &rarr; (1024,)</span>
       </div>
       <div class="card">
         <h3>Training-free boundaries</h3>
-        <p>Actions appear as homogeneous blocks in a temporal similarity matrix, so a
-        Gaussian-tapered checkerboard kernel slid down its diagonal turns block edges into novelty
-        peaks. Nothing is fitted, and nothing is buffered beyond the kernel.</p>
+        <p>Within an action the frames look alike, so a temporal similarity matrix shows
+        homogeneous blocks along its diagonal. We slide a Gaussian-tapered checkerboard kernel down
+        it and take peaks in the novelty score as boundaries. Nothing is fit to data, and only the
+        kernel window is buffered.</p>
         <span class="kbd">kernel 2&thinsp;s &middot; peak height 9 &middot; min gap d = 20</span>
       </div>
       <div class="card">
         <h3>Graph-constrained decoding</h3>
-        <p>Segments are scored against k-means action prototypes, then decoded by a beam search
-        that may only follow edges of a task graph induced from the training sequences. Forbidden
-        transitions cost infinity and are pruned.</p>
+        <p>Each segment is scored against k-means action prototypes, and a beam search picks the
+        best-scoring sequence of actions. The search may only follow edges of a task graph induced
+        from the training sequences, so a transition the graph lacks is never expanded.</p>
         <span class="kbd">B = 10</span>
       </div>
     </div>
@@ -275,9 +276,9 @@ footer{padding:40px 0 64px;border-top:1px solid var(--rule);color:var(--muted);f
 <section id="graph">
   <div class="wrap">
     <h2>The constraint the decoder obeys</h2>
-    <p class="lede">Induced from training sequences, never from test video. Click a step to see
-    what must happen before it and what it enables &mdash; precisely what the beam search may not
-    violate.</p>
+    <p class="lede">The graph is induced offline from the training sequences and never sees test
+    video. Click a step to see which steps have to come before it and which ones it makes
+    available. Those are the edges the beam search is restricted to.</p>
     <div class="tabs" role="tablist" id="graphtabs"></div>
     <div class="graphbox">
       <div class="graphscroll" id="graphhost"></div>
@@ -304,9 +305,10 @@ footer{padding:40px 0 64px;border-top:1px solid var(--rule);color:var(--muted);f
       </table>
     </div>
 
-    <h2 style="margin-top:42px">What the representation buys</h2>
-    <p class="lede">Same decoder throughout. Masking to the interaction box is worth more than
-    either a bigger backbone or a video&ndash;language model.</p>
+    <h2 style="margin-top:42px">Feature comparison</h2>
+    <p class="lede">Every row uses the same decoder and differs only in the features. Restricting
+    the pooling to the interaction box helps more than either a larger backbone or a
+    video&ndash;language model.</p>
     <div class="scroll">
       <table>
         <thead><tr><th>Representation</th><th>MAF</th><th>Level</th><th>Acc</th><th>Edit</th><th>F1@0.5</th></tr></thead>
@@ -322,8 +324,9 @@ footer{padding:40px 0 64px;border-top:1px solid var(--rule);color:var(--muted);f
     </div>
 
     <h2 style="margin-top:42px">Speed</h2>
-    <p class="lede">Seconds per video. Detection and the backbone dominate; parsing and decoding
-    run on CPU and still beat the GPU baseline end to end.</p>
+    <p class="lede">All times are seconds per video. The hand&ndash;object detector and the
+    backbone account for almost all of it, while boundary detection and decoding run on CPU. The
+    total is still well under the ProTAS baseline, whose decoder runs on GPU.</p>
     <div class="scroll">
       <table>
         <thead><tr><th>Setting</th><th>HOD</th><th>Backbone</th><th>Parse</th><th>Total</th><th>FPS</th><th>Acc</th><th>F1@0.5</th></tr></thead>
@@ -342,20 +345,20 @@ footer{padding:40px 0 64px;border-top:1px solid var(--rule);color:var(--muted);f
 <section id="structure">
   <div class="wrap">
     <h2>Does the parse keep its shape?</h2>
-    <p class="lede">Frame metrics reward local agreement; they say little about whether a
-    predicted sequence still makes sense as a procedure. N-step transition accuracy asks how many
-    <em>n</em>-step action transitions survive, swept over progressive completion of each video.
-    The gap widens with <em>n</em>: at five and seven steps our AUC is several times the
-    baseline's, which is the sense in which the structure survives and a frame-level model's does
-    not.</p>
+    <p class="lede">Frame accuracy asks only whether individual frames carry the right label, and
+    says little about whether the predicted sequence is a plausible procedure. N-step transition
+    accuracy instead counts how many <em>n</em>-step action transitions in the prediction match the
+    ground truth, swept over progressive completion of each video. The gap grows with <em>n</em>:
+    at five and seven steps our AUC is several times the baseline's.</p>
     <figure style="margin:0">
       <img src="assets/fig/pr_curves.png" alt="N-step transition precision-recall on EgoPER"
         style="width:100%;height:auto;border:1px solid var(--rule);border-radius:12px;background:#fff">
     </figure>
 
     <h2 style="margin-top:42px">Against a frame-level model</h2>
-    <p class="lede">ProTAS predicts per frame and flickers near boundaries; segment-level decoding
-    under a graph constraint does not. Background frames are removed for legibility.</p>
+    <p class="lede">ProTAS predicts a label per frame and flickers near the boundaries. Decoding
+    at the segment level under a graph constraint produces longer, steadier runs. Background frames
+    are removed for legibility.</p>
     <figure style="margin:0">
       <img src="assets/fig/act_seg.png" alt="Qualitative segmentation against ProTAS"
         style="width:100%;height:auto;border:1px solid var(--rule);border-radius:12px;background:#fff">
@@ -401,11 +404,11 @@ const GRAPH_SVGS = JSON.parse(document.getElementById('graph-svgs').textContent)
 
 /* ---------------- qualitative viewer ---------------- */
 const CAPTIONS = {
-  tea:'Tea. The beam holds several orderings of the early steps until the kettle appears, then collapses onto one and never revisits it.',
-  quesadilla:'Quesadilla. A short, tightly ordered procedure — the task graph leaves the decoder very little room to go wrong.',
-  oatmeal:'Oatmeal. Contains the microwave step, where the visual evidence is a closed door and the task graph carries the parse across it.',
-  coffee:'Coffee. The longest procedure, with revisits — watch hypotheses disagree about how many times a step has happened.',
-  pinwheels:'Pinwheels. Our hardest recipe: fine-grained manipulations that look alike under the interaction box.'
+  tea:'Tea. Several orderings of the early steps stay in the beam until the kettle is visible, after which the search settles on one of them.',
+  quesadilla:'Quesadilla. A short procedure with tight ordering, so the task graph leaves the decoder few transitions to choose between.',
+  oatmeal:'Oatmeal. Contains the microwave step, where the only visual evidence is a closed door and the graph is what keeps the sequence on track.',
+  coffee:'Coffee. The longest procedure and the one with revisits, so hypotheses differ in how many times a step has already occurred.',
+  pinwheels:'Pinwheels. The hardest recipe for us. The manipulations are fine-grained and look much the same once cropped to the interaction box.'
 };
 const vt=document.getElementById('vidtabs'), vid=document.getElementById('qvid'),
       vcap=document.getElementById('vidcap'), bnow=document.getElementById('beamnow'),
