@@ -1,13 +1,26 @@
 # VidParse: Online Parsing of Egocentric Procedures Like a Pro
 
-[**Anubhav Gupta**](https://learn2phoenix.github.io)<sup>1</sup> · [**Archit Kambhamettu**](https://architkam.github.io/)<sup>1</sup> · [**Vatsal Agarwal**](https://vatsalag99.github.io/)<sup>1</sup> · [**Pulkit Kumar**](https://www.cs.umd.edu/~pulkit/)<sup>1</sup> · [**Abhinav Shrivastava**](http://www.cs.umd.edu/~abhinav/)<sup>1</sup>
+<p align="center">
+  <a href="https://learn2phoenix.github.io"><b>Anubhav Gupta</b></a>&nbsp;&nbsp;&nbsp;&nbsp;
+  <a href="https://architkam.github.io/"><b>Archit Kambhamettu</b></a>&nbsp;&nbsp;&nbsp;&nbsp;
+  <a href="https://vatsalag99.github.io/"><b>Vatsal Agarwal</b></a>&nbsp;&nbsp;&nbsp;&nbsp;
+  <a href="https://www.cs.umd.edu/~pulkit/"><b>Pulkit Kumar</b></a>&nbsp;&nbsp;&nbsp;&nbsp;
+  <a href="http://www.cs.umd.edu/~abhinav/"><b>Abhinav Shrivastava</b></a>
+</p>
 
-<sup>1</sup>University of Maryland, College Park <br>
-**ECCV 2026** <br>
+<p align="center">
+  University of Maryland, College Park
+</p>
 
-<a href='https://arxiv.org/abs/TODO-arxiv-id'><img src='https://img.shields.io/badge/arXiv-VidParse-red' alt='Paper PDF'></a>
-<a href='https://learn2phoenix.github.io/VidParse'><img src='https://img.shields.io/badge/Project_Page-VidParse-green' alt='Project Page'></a>
-<a href='https://github.com/robert80203/EgoPER_official'><img src='https://img.shields.io/badge/Dataset-EgoPER-blue' alt='EgoPER'></a>
+<p align="center">
+  <b>ECCV 2026</b>
+</p>
+
+<p align="center">
+  <a href="https://arxiv.org/abs/TODO-arxiv-id"><img src="https://img.shields.io/badge/arXiv-VidParse-red" alt="Paper PDF"></a>
+  <a href="https://learn2phoenix.github.io/VidParse"><img src="https://img.shields.io/badge/Project_Page-VidParse-green" alt="Project Page"></a>
+  <a href="https://github.com/robert80203/EgoPER_official"><img src="https://img.shields.io/badge/Dataset-EgoPER-blue" alt="EgoPER"></a>
+</p>
 
 <p align="center">
   <a href="https://learn2phoenix.github.io/VidParse">
