@@ -252,7 +252,7 @@ footer{padding:40px 0 64px;border-top:1px solid var(--rule);color:var(--muted);f
 <section id="teaser">
   <div class="wrap">
     <figure class="teaser">
-      <video src="assets/teaser/parse.mp4" autoplay muted loop playsinline
+      <video src="assets/teaser/parse.mp4?v=f8bee54cdc" autoplay muted loop playsinline
         aria-label="A tea video playing beside its task graph, with each step lighting up as the parser commits to it"></video>
       <figcaption><strong>Tea, parsed online, with playback sped up 3&times;.</strong> On the right
       is the task graph induced from the training sequences. Filled boxes are steps already
@@ -578,7 +578,7 @@ function selectVideo(name, btn){
   [].forEach.call(vt.children, function(c){ c.setAttribute('aria-selected','false'); });
   if(btn) btn.setAttribute('aria-selected','true');
   current=name; lastStep=-1;
-  vid.src='assets/'+name+'.mp4';
+  vid.src='assets/'+name+'.mp4?v=f8bee54cdc';
   vcap.textContent=CAPTIONS[name]||'';
   drawTrellis();
   vid.play().catch(function(){});
