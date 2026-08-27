@@ -40,7 +40,7 @@ section{padding:52px 0;border-top:1px solid var(--rule)}
 h2{font-family:var(--serif);font-size:32px;font-weight:600;margin-bottom:8px}
 .lede{color:var(--muted);margin:0 0 28px}
 .teaser{margin:0}
-.teaser img{display:block;margin:0 auto;width:auto;height:auto;
+.teaser video{display:block;margin:0 auto;width:auto;height:auto;
   max-width:min(100%,940px);max-height:40vh;
   border:1px solid var(--rule);border-radius:12px;background:#fff}
 .teaser figcaption{max-width:940px;margin:12px auto 0;text-align:center}
@@ -55,7 +55,7 @@ figcaption{color:var(--muted);font-size:15.5px;margin-top:12px}
   .authors{margin-top:14px}
   .badges{margin-top:16px}
   #teaser{padding:14px 0 22px}
-  .teaser img{max-height:34vh}
+  .teaser video{max-height:34vh}
 }
 
 header{padding:44px 0 32px;text-align:center}
@@ -90,13 +90,38 @@ header h1{font-family:var(--serif);font-size:clamp(28px,4.6vw,48px);font-weight:
    left a wide band of dead tint on either side of a 1.43:1 frame. */
 .stage{display:flex;align-items:center;justify-content:center;background:var(--tint);
   width:fit-content;max-width:100%;margin:0 auto}
-.beamwrap{margin-top:26px;border:1px solid var(--rule);border-radius:12px;background:var(--tint);overflow:hidden}
-.beamhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
-  padding:13px 16px;background:var(--paper);border-bottom:1px solid var(--rule)}
+/* Side by side by default: the frame is 1.43:1 and the page is 1296px wide, so
+   stacking them left most of the row empty. Clicking either card drops back to
+   one-below-the-other, where each gets the full width. */
+.viewer{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(0,1fr);
+  gap:20px;align-items:stretch}
+.viewer.stacked{grid-template-columns:minmax(0,1fr);align-items:start}
+@media(max-width:1000px){.viewer{grid-template-columns:minmax(0,1fr)}}
+.vpanel{margin:0;position:relative;display:flex;flex-direction:column}
+.beamwrap{position:relative;border:1px solid var(--rule);border-radius:12px;
+  background:var(--tint);overflow:hidden;display:flex;flex-direction:column}
+.vpanel,.beamwrap{cursor:zoom-in}
+.viewer.stacked .vpanel,.viewer.stacked .beamwrap{cursor:zoom-out}
+.vpanel video,.trellis{cursor:auto}
+.grow{position:absolute;top:10px;right:12px;z-index:3;display:inline-flex;
+  align-items:center;gap:7px;font-family:var(--sans);font-size:13.5px;font-weight:600;
+  color:var(--ink);background:var(--paper);border:1px solid var(--muted);
+  border-radius:999px;padding:7px 15px;cursor:pointer;transition:.14s;
+  box-shadow:0 1px 5px rgba(27,36,48,.13)}
+.grow:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.grow .gi{font-size:15px;line-height:1}
+/* in the beam header the toggle sits in the flow, so it can never sit on top of
+   the step counter the way an absolutely positioned one did */
+.grow.inflow{position:static;box-shadow:none;padding:5px 13px;font-size:13px}
+.beamhead{display:flex;justify-content:space-between;align-items:center;gap:12px;
+  flex-wrap:wrap;padding:10px 12px 10px 16px;background:var(--paper);
+  border-bottom:1px solid var(--rule)}
+.bhright{display:flex;align-items:center;gap:14px;flex:0 0 auto}
 .beamhead .k{font-family:var(--mono);font-size:11px;letter-spacing:.11em;
   text-transform:uppercase;color:var(--muted)}
 .beamhead .now{font-weight:700;color:var(--ink);font-size:17.5px;margin-left:10px}
-.trellis{overflow:auto;max-height:min(26vh,340px);padding:12px 16px}
+.trellis{overflow:auto;padding:12px 16px;flex:1 1 auto;min-height:150px}
+.viewer.stacked .trellis{flex:0 0 auto;max-height:min(26vh,340px)}
 .trellis svg{display:block}
 .hint{margin:0;padding:0 16px 12px;font-size:13.5px;color:var(--muted)}
 .beam{border:1px solid var(--rule);border-radius:12px;background:var(--tint);
@@ -207,13 +232,13 @@ footer{padding:40px 0 64px;border-top:1px solid var(--rule);color:var(--muted);f
   <div class="wrap">
     <h1>VidParse: Online Parsing of Egocentric Procedures Like a Pro</h1>
     <div class="authors">
-      <a href="https://learn2phoenix.github.io">Anubhav Gupta</a><sup>1</sup> &middot;
-      <a href="https://architkam.github.io/">Archit Kambhamettu</a><sup>1</sup> &middot;
-      <a href="https://vatsalag99.github.io/">Vatsal Agarwal</a><sup>1</sup> &middot;
-      <a href="https://www.cs.umd.edu/~pulkit/">Pulkit Kumar</a><sup>1</sup> &middot;
-      <a href="http://www.cs.umd.edu/~abhinav/">Abhinav Shrivastava</a><sup>1</sup>
+      <a href="https://learn2phoenix.github.io">Anubhav Gupta</a>,
+      <a href="https://architkam.github.io/">Archit Kambhamettu</a>,
+      <a href="https://vatsalag99.github.io/">Vatsal Agarwal</a>,
+      <a href="https://www.cs.umd.edu/~pulkit/">Pulkit Kumar</a>,
+      <a href="http://www.cs.umd.edu/~abhinav/">Abhinav Shrivastava</a>
     </div>
-    <div class="affil"><sup>1</sup>University of Maryland, College Park</div>
+    <div class="affil">University of Maryland, College Park</div>
     <div class="venue">ECCV 2026</div>
     <div class="badges">
       <a class="badge" href="TODO-arxiv-link">arXiv</a>
@@ -227,12 +252,12 @@ footer{padding:40px 0 64px;border-top:1px solid var(--rule);color:var(--muted);f
 <section id="teaser">
   <div class="wrap">
     <figure class="teaser">
-      <img src="assets/fig/teaser.png"
-        alt="VidParse overview: temporal self-similarity, boundary detection, graph-constrained beam search, and the resulting action prediction">
-      <figcaption><strong>VidParse.</strong> (a) A temporal similarity matrix over
-      manipulation-anchored features. (b) A checkerboard kernel down its diagonal turns
-      block edges into novelty peaks. (c) A beam of hypotheses, pruned by the task
-      graph. (d) The committed parse.</figcaption>
+      <video src="assets/teaser/parse.mp4" autoplay muted loop playsinline
+        aria-label="A tea video playing beside its task graph, with each step lighting up as the parser commits to it"></video>
+      <figcaption><strong>Tea, parsed online, with playback sped up 3&times;.</strong> On the right
+      is the task graph induced from the training sequences. Filled boxes are steps already
+      committed, the highlighted box is the current one, and blue edges are the transitions
+      taken.</figcaption>
     </figure>
   </div>
 </section>
@@ -260,26 +285,30 @@ footer{padding:40px 0 64px;border-top:1px solid var(--rule);color:var(--muted);f
 <section id="qualitative">
   <div class="wrap">
     <h2>Watch it parse</h2>
-    <p class="lede">Each clip is a real run on a test video. The parser gets one frame at a time
-    and never looks ahead. Three bars run under the video on a shared clock: ground truth, the
-    parse VidParse has committed to, and the ProTAS baseline on the same frames. Background is
-    dropped from all three so they line up. Below them is the beam at the current playhead. Scroll
-    it to see which hypotheses are still alive and what sequence each one has accumulated.</p>
+    <p class="lede">Each clip is a real run on a test video. Three bars run under it on a shared
+    clock: ground truth, the parse VidParse has committed to, and the ProTAS baseline on the same
+    frames. Background is dropped from all three so they line up. Alongside is the beam at the
+    current playhead. Scroll it to see which hypotheses are still alive and what sequence each one
+    has accumulated.</p>
 
     <div class="tabs" role="tablist" id="vidtabs"></div>
-    <div class="cell">
-    <figure style="margin:0">
+    <div class="cell viewer" id="viewer">
+    <figure class="vpanel" id="vpanel">
+      <button type="button" class="grow"><span class="gi">&#8661;</span><span class="gt">Stack</span></button>
       <div class="stage"><video id="qvid" controls muted loop playsinline preload="metadata"></video></div>
       <figcaption id="vidcap"></figcaption>
     </figure>
 
-    <div class="beamwrap">
+    <div class="beamwrap" id="bpanel">
       <div class="beamhead">
         <div>
           <span class="k">Beam at the playhead</span>
           <span class="now" id="beamnow">&mdash;</span>
         </div>
-        <span class="k" id="beamstep"></span>
+        <div class="bhright">
+          <span class="k" id="beamstep"></span>
+          <button type="button" class="grow inflow"><span class="gi">&#8661;</span><span class="gt">Stack</span></button>
+        </div>
       </div>
       <div class="trellis" id="trellis"><svg id="beamsvg"></svg></div>
       <p class="hint">One column per emitted segment, one box per live hypothesis, each joined to
@@ -562,6 +591,26 @@ Object.keys(BEAMS).forEach(function(name, i){
   b.onclick=function(){ selectVideo(name, b); };
   vt.appendChild(b);
 });
+/* The whole card toggles, but not the video transport, the scrolling trellis or
+   any real control inside them -- clicking play must not relayout the section. */
+const viewer=document.getElementById('viewer');
+function syncGrow(){
+  const st=viewer.classList.contains('stacked');
+  [].forEach.call(document.querySelectorAll('.grow .gt'), function(e){
+    e.textContent = st ? 'Side by side' : 'Stack'; });
+  [].forEach.call(document.querySelectorAll('.grow .gi'), function(e){
+    e.innerHTML = st ? '&#8660;' : '&#8661;'; });
+}
+function toggleStack(e){
+  if(e.target.closest('video, a, input, .trellis')) return;
+  viewer.classList.toggle('stacked');
+  syncGrow();
+  lastStep=-1; drawTrellis();
+}
+syncGrow();
+document.getElementById('vpanel').addEventListener('click', toggleStack);
+document.getElementById('bpanel').addEventListener('click', toggleStack);
+
 vid.addEventListener('timeupdate', drawTrellis);
 vid.addEventListener('seeked', function(){ lastStep=-1; drawTrellis(); });
 vid.addEventListener('loadedmetadata', drawTrellis);
