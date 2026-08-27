@@ -41,8 +41,7 @@ h2{font-family:var(--serif);font-size:32px;font-weight:600;margin-bottom:8px}
 .lede{color:var(--muted);margin:0 0 28px}
 .teaser{margin:0}
 .teaser video{display:block;margin:0 auto;width:auto;height:auto;
-  max-width:min(100%,940px);max-height:40vh;
-  border-radius:12px;background:#fff}
+  max-width:min(100%,940px);max-height:40vh}
 .teaser figcaption{max-width:940px;margin:12px auto 0;text-align:center}
 figcaption{color:var(--muted);font-size:15.5px;margin-top:12px}
 #teaser{padding:20px 0 30px;border-top:0}
@@ -80,7 +79,7 @@ header h1{font-family:var(--serif);font-size:clamp(28px,4.6vw,48px);font-weight:
 .tab[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
 .viewer{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
 @media(max-width:900px){.viewer{grid-template-columns:1fr}}
-.stage{border-radius:12px;overflow:hidden;background:var(--paper)}
+.stage{overflow:hidden}
 /* The video renders 1024x718, which at full container width is 682px tall --
    taller than a laptop viewport once the beam is added, so the beam was always
    below the fold and the two could never be watched together. Capping by
@@ -89,7 +88,7 @@ header h1{font-family:var(--serif);font-size:clamp(28px,4.6vw,48px);font-weight:
   height:auto;max-height:min(66vh,780px)}
 /* width:fit-content so the frame ends where the video ends -- a fixed-width box
    left a wide band of dead tint on either side of a 1.43:1 frame. */
-.stage{display:flex;align-items:center;justify-content:center;background:var(--tint);
+.stage{display:flex;align-items:center;justify-content:center;
   width:fit-content;max-width:100%;margin:0 auto}
 /* Side by side by default: the frame is 1.43:1 and the page is 1296px wide, so
    stacking them left most of the row empty. Clicking either card drops back to
