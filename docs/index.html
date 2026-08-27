@@ -42,7 +42,7 @@ h2{font-family:var(--serif);font-size:32px;font-weight:600;margin-bottom:8px}
 .teaser{margin:0}
 .teaser video{display:block;margin:0 auto;width:auto;height:auto;
   max-width:min(100%,940px);max-height:40vh;
-  border:1px solid var(--rule);border-radius:12px;background:#fff}
+  border-radius:12px;background:#fff}
 .teaser figcaption{max-width:940px;margin:12px auto 0;text-align:center}
 figcaption{color:var(--muted);font-size:15.5px;margin-top:12px}
 #teaser{padding:20px 0 30px;border-top:0}
@@ -80,7 +80,7 @@ header h1{font-family:var(--serif);font-size:clamp(28px,4.6vw,48px);font-weight:
 .tab[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
 .viewer{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
 @media(max-width:900px){.viewer{grid-template-columns:1fr}}
-.stage{border:1px solid var(--rule);border-radius:12px;overflow:hidden;background:var(--paper)}
+.stage{border-radius:12px;overflow:hidden;background:var(--paper)}
 /* The video renders 1024x718, which at full container width is 682px tall --
    taller than a laptop viewport once the beam is added, so the beam was always
    below the fold and the two could never be watched together. Capping by
@@ -327,7 +327,7 @@ footer{padding:40px 0 64px;border-top:1px solid var(--rule);color:var(--muted);f
     constraint on which action sequences the decoder is allowed to produce.</p>
     <figure style="margin:0 0 26px">
       <img src="assets/fig/method.png" alt="The VidParse pipeline" style="width:100%;height:auto;
-        border:1px solid var(--rule);border-radius:12px;background:#fff">
+        border-radius:12px;background:#fff">
     </figure>
     <div class="steps">
       <div class="card">
@@ -449,7 +449,7 @@ footer{padding:40px 0 64px;border-top:1px solid var(--rule);color:var(--muted);f
     at five and seven steps our AUC is several times the baseline's.</p>
     <figure style="margin:0">
       <img src="assets/fig/pr_curves.png" alt="N-step transition precision-recall on EgoPER"
-        style="width:100%;height:auto;border:1px solid var(--rule);border-radius:12px;background:#fff">
+        style="width:100%;height:auto;border-radius:12px;background:#fff">
     </figure>
 
     <h2 style="margin-top:42px">Against a frame-level model</h2>
@@ -458,7 +458,7 @@ footer{padding:40px 0 64px;border-top:1px solid var(--rule);color:var(--muted);f
     are removed for legibility.</p>
     <figure style="margin:0">
       <img src="assets/fig/act_seg.png" alt="Qualitative segmentation against ProTAS"
-        style="width:100%;height:auto;border:1px solid var(--rule);border-radius:12px;background:#fff">
+        style="width:100%;height:auto;border-radius:12px;background:#fff">
     </figure>
   </div>
 </section>
