@@ -9,6 +9,17 @@
 <a href='https://learn2phoenix.github.io/VidParse'><img src='https://img.shields.io/badge/Project_Page-VidParse-green' alt='Project Page'></a>
 <a href='https://github.com/robert80203/EgoPER_official'><img src='https://img.shields.io/badge/Dataset-EgoPER-blue' alt='EgoPER'></a>
 
+<p align="center">
+  <a href="https://learn2phoenix.github.io/VidParse">
+    <img src="assets/parse.gif" width="100%"
+      alt="A tea video playing beside its induced task graph, each step highlighting as the parser commits to it">
+  </a>
+</p>
+
+<p align="center"><sub>Tea, parsed online. Filled boxes are steps already committed, the
+highlighted box is the current one. First 45 seconds, playback sped up 3&times;.
+<a href="https://learn2phoenix.github.io/VidParse">Full version on the project page.</a></sub></p>
+
 ---
 
 ## Overview
