@@ -223,11 +223,14 @@ tests/test_pipeline.py       kernel shape, novelty peaks, config completeness
 
 ```bibtex
 @inproceedings{gupta2026vidparse,
-  title     = {VidParse: Online Parsing of Egocentric Procedures Like a Pro},
-  author    = {Gupta, Anubhav and Kambhamettu, Archit and Agarwal, Vatsal
-               and Kumar, Pulkit and Shrivastava, Abhinav},
-  booktitle = {European Conference on Computer Vision (ECCV)},
-  year      = {2026}
+  title         = {VidParse: Online Parsing of Egocentric Procedures Like a Pro},
+  author        = {Gupta, Anubhav and Kambhamettu, Archit and Agarwal, Vatsal
+                   and Kumar, Pulkit and Shrivastava, Abhinav},
+  booktitle     = {European Conference on Computer Vision (ECCV)},
+  year          = {2026},
+  eprint        = {2608.27562},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CV}
 }
 ```
 
