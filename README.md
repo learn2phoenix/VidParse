@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <a href="https://arxiv.org/abs/TODO-arxiv-id"><img src="https://img.shields.io/badge/arXiv-VidParse-red" alt="Paper PDF"></a>
+  <a href="https://arxiv.org/abs/2608.27562"><img src="https://img.shields.io/badge/arXiv-VidParse-red" alt="Paper PDF"></a>
   <a href="https://learn2phoenix.github.io/VidParse"><img src="https://img.shields.io/badge/Project_Page-VidParse-green" alt="Project Page"></a>
   <a href="https://github.com/robert80203/EgoPER_official"><img src="https://img.shields.io/badge/Dataset-EgoPER-blue" alt="EgoPER"></a>
 </p>
