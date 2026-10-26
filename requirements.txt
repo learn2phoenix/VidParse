@@ -15,4 +15,4 @@ tqdm>=4.65
 
 # Feature extraction only (step 0); not needed to parse:
 #   torch>=2.0
-#   torchvision>=0.15
+#   transformers>=4.40

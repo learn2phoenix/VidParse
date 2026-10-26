@@ -147,12 +147,15 @@ features (step 0 below), not to parse. `pygraphviz` needs Graphviz headers
 ## Data
 
 [EgoPER](https://github.com/robert80203/EgoPER_official) (Lee et al., CVPR 2024),
-which we do not redistribute. We use the 213 normal videos and the splits of
-ProTAS, at 10 fps. Lay it out as:
+which we do not redistribute: its 216 normal videos, EgoPER's own
+`annotation.json`, and the ProTAS split, at 10 fps. The published numbers use
+that split with one coffee training video left out, `coffee_u1_a1_normal_018`
+(162 training, 53 test videos); keeping it moves the 53-video mean by about
+−0.2 Acc and +0.7 Edit. Lay it out as:
 
 ```
 <DATA_ROOT>/
-  annotation.json
+  annotation.json                                   # EgoPER's annotation file
   Videos/                                           # raw mp4s; needed for feature extraction only
   hod/<video_id>/detections.json                    # hand-object detections
   feats_dinov2_hod_enclosed_10fps/<video_id>.npy    # MAFs, one (T, 1024) array per video
@@ -174,18 +177,37 @@ distributed with MS-TCN), at the native 15 fps. Convert the labels once with
   labels/<video_id>.txt                             # the 71-class GTEA labels
   Videos/<video_id>.mp4
   hod/<video_id>/detections.json
-  feats_dinov2_hod_enclosed_15fps/<video_id>.npy    # MAFs, step 0 with --fps 15
+  feats_dinov2_hod_enclosed_15fps/<video_id>.npy    # MAFs, step 0 (GTEA flags below)
   splits/train.split{1..4}.bundle, test.split{1..4}.bundle
 ```
 
 ### Step 0 — features
 
-MAFs are the only input the parser needs. `scripts/extract_maf_features.py`
-implements the recipe: run the frozen
-[hand–object detector](https://github.com/ddshan/hand_object_detector) to get
-per-frame boxes, take the minimum spanning box over hands and active objects,
-and average the DINOv2 ViT-L/14 patch tokens that intersect it. Frames with no
-detection above `conf_thresh` fall back to the full-frame mean.
+MAFs are the only input the parser needs. `scripts/extract_maf_features.py` is
+the extractor that produced the paper's features. Run the frozen
+[hand–object detector](https://github.com/ddshan/hand_object_detector) of Shan
+et al. on every source frame first; our launch script uses its ResNet-101 100K
+checkpoint (`faster_rcnn_1_8_132028`) at the default thresholds, so the saved
+boxes have score ≥ 0.5. For each frame sampled at true 10 fps (15
+on GTEA), the extractor takes the box enclosing every saved hand and object
+detection and averages the final-layer patch tokens of DINOv2 ViT-L/14
+(`facebook/dinov2-large`) that the box covers. Three details matter for
+reproducing the numbers exactly:
+
+- The model sees the Hugging Face image processor's input: shortest edge 256,
+  center crop 224, a 16×16 grid. The box is mapped onto that grid in full-frame
+  coordinates, not adjusted for the crop, so on 16:9 video the pooled cells are
+  not exactly the ones under the box.
+- A frame without a detection takes the previous frame's feature; frames before
+  the first detection take the first valid one.
+- GTEA's detection files are keyed `frame_0001.jpg` from 1 and the paper's GTEA
+  features read them from 0, so each frame took the previous frame's box. Pass
+  `--fps 15 --det_key 'frame_{:04d}.jpg' --det_offset 0` to reproduce them.
+
+```bash
+python scripts/extract_maf_features.py --video_dir <DATA_ROOT>/Videos \
+    --det_dir <DATA_ROOT>/hod --out_dir <DATA_ROOT>/feats_dinov2_hod_enclosed_10fps --fps 10
+```
 
 ## Run
 

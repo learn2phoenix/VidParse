@@ -214,6 +214,41 @@ def test_split_template_resolves_per_fold():
         runner.load_config(path)
 
 
+# ---------------------------------------------------------------------------
+# feature extraction (step 0): the parts that decide which tokens are pooled
+# ---------------------------------------------------------------------------
+
+def _maf():
+    sys.path.insert(0, os.path.join(ROOT, 'scripts'))
+    import extract_maf_features as maf
+    return maf
+
+
+def test_maf_sampling_is_true_fps():
+    """15 fps source -> 10 fps features, not a rounded stride (which would give 7.5)."""
+    maf = _maf()
+    idx = maf.sample_indices(150, 15.0, 10)
+    assert len(idx) == 100 and idx[:4] == [0, 1, 3, 4]
+    assert maf.sample_indices(150, 15.0, 15) == list(range(150))
+
+
+def test_maf_box_maps_in_full_frame_coordinates():
+    """The enclosing box of all detections, floor/ceil onto 16x16, inclusive, clipped."""
+    maf = _maf()
+    dets = [{'bbox': [640, 360, 700, 400]}, {'bbox': [100, 600, 200, 719]}]
+    py1, py2, px1, px2 = maf.grid_slice(dets, 1280, 720)
+    assert (py1, py2, px1, px2) == (8, 15, 1, 9)
+    assert maf.grid_slice([{'bbox': [0, 0, 1280, 720]}], 1280, 720) == (0, 15, 0, 15)
+
+
+def test_maf_missing_frames_forward_then_back_fill():
+    maf = _maf()
+    a, b = np.full(4, 1.0), np.full(4, 2.0)
+    out = maf.fill([None, None, a, None, b, None], 4)
+    assert [row[0] for row in out] == [1, 1, 1, 1, 2, 2]
+    assert not maf.fill([None, None], 4).any()
+
+
 def test_prototypes_seed_defaults_to_the_published_value():
     for path in CONFIGS:
         cfg = json.load(open(path))
