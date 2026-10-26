@@ -40,12 +40,24 @@ STAGES = ['graph', 'prototypes', 'scores', 'parse', 'eval']
 # config
 # --------------------------------------------------------------------------
 
-def load_config(path):
+def load_config(path, split=None):
     with open(path) as f:
         cfg = json.load(f)
     for key in ('dataset', 'data', 'output_dir', 'recipes'):
         if key not in cfg:
             sys.exit(f"config is missing required key: {key!r}")
+    # Multi-split datasets (GTEA) write '{split}' into their split lists and
+    # output_dir; --split picks the fold, each fold gets its own output tree.
+    split = split if split is not None else cfg.get('split')
+    templated = [k for k, v in list(cfg['data'].items()) + [('output_dir', cfg['output_dir'])]
+                 if isinstance(v, str) and '{split}' in v]
+    if templated:
+        if split is None:
+            sys.exit(f"config has per-split paths ({', '.join(templated)}); pass --split")
+        for k, v in cfg['data'].items():
+            if isinstance(v, str):
+                cfg['data'][k] = v.replace('{split}', str(split))
+        cfg['output_dir'] = cfg['output_dir'].replace('{split}', str(split))
     root = cfg['data']['root']
     # every data path is relative to data.root unless it is already absolute
     for k, v in cfg['data'].items():
@@ -350,6 +362,8 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('--config', required=True)
+    ap.add_argument('--split', default=None,
+                    help="fold for configs with '{split}' paths (GTEA: 1-4)")
     ap.add_argument('--stage', default='all', choices=STAGES + ['all'])
     ap.add_argument('--workers', type=int, default=max(1, (os.cpu_count() or 4) - 1),
                     help='parallel worker processes (default: cores - 1)')
@@ -357,7 +371,7 @@ def main():
                     help='print what would run, touch nothing')
     args = ap.parse_args()
 
-    cfg = load_config(args.config)
+    cfg = load_config(args.config, args.split)
     p = paths(cfg)
     print(f"dataset={cfg['dataset']}  features={cfg['features']['name']}  "
           f"fps={cfg['fps']}  workers={args.workers}")

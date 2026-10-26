@@ -77,6 +77,19 @@ def test_detector_exposes_the_paper_knobs():
     assert det.min_distance == 10
 
 
+def test_min_distance_gates_emitted_boundaries():
+    """The gap to the previous boundary follows min_distance (GTEA 10, EgoPER 20),
+    not a hard-coded 20."""
+    feats = synthetic_stream(block=12, n_blocks=12)
+    gaps = {}
+    for d in (10, 20):
+        _, emitted = run_detector(feats, kernel_width=5, peak_height=0.0, min_distance=d)
+        assert len(emitted) > 1, f'min_distance={d}: too few boundaries to test'
+        gaps[d] = np.diff(emitted)
+        assert gaps[d].min() >= d, f'min_distance={d}: emitted a gap of {gaps[d].min()}'
+    assert gaps[10].min() < 20, 'min_distance=10 never produced a gap under 20'
+
+
 def test_novelty_peaks_at_real_transitions():
     """A four-block stream should produce novelty maxima near the seams."""
     block = 60
@@ -162,6 +175,43 @@ def test_egoper_config_matches_the_paper():
     for k in ('continuation_bonus', 'continuation_penalty', 'short_duration_penalty',
               'temporal_offset_penalty', 'transition_penalty'):
         assert ego['decoding'][k] == 0.0, f'decoding.{k} must be 0.0 to match the paper'
+
+
+def test_gtea_config_matches_the_paper():
+    """The paper's method on GTEA: k-means centroids, cosine, 15-frame kernel, beam 10."""
+    g = json.load(open(os.path.join(ROOT, 'configs', 'gtea.json')))
+    assert g['fps'] == 15.0
+    assert int(g['boundary']['kernel_seconds'] * g['fps']) == 15
+    assert g['boundary']['peak_height'] == 5.0
+    assert g['boundary']['min_distance'] == 10
+    assert g['prototypes']['num_clusters'] == 3
+    assert g['prototypes']['proto_type'] == 'kmeans'
+    assert g['prototypes']['micro_duration_seconds'] == 1.5
+    assert g['prototypes']['micro_stride_seconds'] == 0.5
+    assert g['distance_metric'] == 'cosine'
+    assert g['scoring']['segment_duration'] == 1.5
+    assert g['decoding']['segment_duration'] == 1.5
+    assert g['decoding']['beam_width'] == 10
+    assert g['decoding']['force_distinct_actions'] is True
+    assert not g['decoding']['allow_skipping']
+    assert g['decoding']['max_segment_duration'] is None
+    for k in ('bridge_start', 'bridge_end', 'bridge_fill'):
+        assert g['decoding'][k] is None, f'decoding.{k}: the EgoPER bridge must be off'
+    for k in ('continuation_bonus', 'continuation_penalty', 'short_duration_penalty',
+              'temporal_offset_penalty', 'transition_penalty'):
+        assert g['decoding'][k] == 0.0, f'decoding.{k} must be 0.0 to match the paper'
+
+
+def test_split_template_resolves_per_fold():
+    sys.path.insert(0, ROOT)
+    import run as runner
+    path = os.path.join(ROOT, 'configs', 'gtea.json')
+    cfg = runner.load_config(path, split=3)
+    assert cfg['data']['train_list'].endswith('splits/train.split3.bundle')
+    assert cfg['data']['test_list'].endswith('splits/test.split3.bundle')
+    assert cfg['output_dir'].endswith(os.path.join('gtea', 'split3'))
+    with pytest.raises(SystemExit):
+        runner.load_config(path)
 
 
 def test_prototypes_seed_defaults_to_the_published_value():

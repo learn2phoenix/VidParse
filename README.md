@@ -58,8 +58,9 @@ Three ideas, in the order the pipeline applies them:
    task graph induced from the training sequences. Transitions the procedure
    does not allow are assigned infinite cost and pruned.
 
-> **Scope.** This release covers **EgoPER**. Every EgoPER number in the paper
-> reproduces from this code — see [Reproduction](#reproduction).
+> **Scope.** This release covers **EgoPER** and **GTEA**. Every EgoPER number in
+> the paper reproduces from this code; for GTEA, see the note under
+> [Results on GTEA](#results-on-gtea).
 
 ## Results on EgoPER
 
@@ -102,6 +103,34 @@ Beam width against accuracy:
 | 5 | 78.47 | 86.89 | 74.47 |
 | **10** | **80.69** | **88.69** | **77.61** |
 
+## Results on GTEA
+
+The four standard leave-one-subject-out splits (7 test videos each), averaged
+unweighted — the same aggregation as the baseline rows.
+
+| Method | Inference | Train-free | Acc | Edit | F1@0.1 | F1@0.25 | F1@0.5 |
+|---|---|---|---|---|---|---|---|
+| MS-TCN | offline | ✗ | 79.35 | 84.46 | 86.54 | 83.79 | 71.86 |
+| MS-TCN | online | ✗ | 47.28 | 60.26 | 66.75 | 60.12 | 40.29 |
+| ProTAS | online | ✗ | 73.19 | 71.81 | 72.89 | 68.94 | 54.87 |
+| **VidParse** | **online** | **✓** | **82.66** | **89.33** | **87.56** | **85.08** | **74.03** |
+
+Per split:
+
+| split (held-out subject) | Acc | Edit | F1@0.1 | F1@0.25 | F1@0.5 |
+|---|---|---|---|---|---|
+| 1 (S1) | 89.51 | 88.70 | 92.59 | 90.61 | 81.25 |
+| 2 (S2) | 70.90 | 83.05 | 75.44 | 71.74 | 61.44 |
+| 3 (S3) | 85.92 | 93.74 | 92.87 | 91.58 | 80.25 |
+| 4 (S4) | 84.29 | 91.82 | 89.35 | 86.38 | 73.16 |
+
+This is the method as the paper describes it, with the EgoPER beam width of 10.
+The GTEA column of the paper's Table 1 is split 1 alone (89.1 / 87.4 / 91.9 /
+89.9 / 80.5), while the baseline rows beside it are 4-split means; this update
+reports the 4-split mean, the like-for-like comparison. Split 1 differs slightly
+from the paper's figure because the paper's GTEA run used an earlier
+prototype-matching code path.
+
 ## Install
 
 ```bash
@@ -132,6 +161,22 @@ ProTAS, at 10 fps. Lay it out as:
 
 Point `data.root` in the config at `<DATA_ROOT>` and the rest resolves relative
 to it.
+
+[GTEA](https://cbs.ic.gatech.edu/fpv/) (Fathi et al., CVPR 2011): 28 videos,
+the cleaned 71-class action labels, and the standard four split bundles (as
+distributed with MS-TCN), at the native 15 fps. Convert the labels once with
+`scripts/convert_gtea_to_json.py --gtea_dir <GTEA_ROOT>/labels --output_json
+<GTEA_ROOT>/gtea.json`, and lay it out as:
+
+```
+<GTEA_ROOT>/
+  gtea.json                                         # from scripts/convert_gtea_to_json.py
+  labels/<video_id>.txt                             # the 71-class GTEA labels
+  Videos/<video_id>.mp4
+  hod/<video_id>/detections.json
+  feats_dinov2_hod_enclosed_15fps/<video_id>.npy    # MAFs, step 0 with --fps 15
+  splits/train.split{1..4}.bundle, test.split{1..4}.bundle
+```
 
 ### Step 0 — features
 
@@ -165,6 +210,14 @@ resumes:
 `--dry-run` prints the exact commands without touching anything. `--workers`
 defaults to cores − 1.
 
+GTEA runs one split at a time (`--split 1` … `4`, each into its own output
+directory), or all four with their mean:
+
+```bash
+python run.py --config configs/gtea.json --split 2 --stage all
+python scripts/gtea_4fold.py --config configs/gtea.json --workers 16
+```
+
 Every setting the paper varied lives in `configs/egoper.json`, and each section
 of that file carries a `_note` saying what its knobs do. Nothing is hidden in the
 code: the runner reads the config and passes every value explicitly.
@@ -176,6 +229,12 @@ paper ran 3.11.9) and matches the published value to the precision the paper
 prints — the main row across all 53 test videos and all five recipes, every
 feature-ablation row, and the whole beam-width sweep. Prototype arrays match the
 archived ones at `max |Δ| = 0`.
+
+The GTEA table above was produced by `scripts/gtea_4fold.py` with
+`configs/gtea.json`, from this code. GTEA uses the same method as EgoPER, with
+its own settings: 15 fps, 3 centroids per action, a 15-frame kernel, peak height
+5, minimum gap 10, 1.5 s segments. `configs/gtea.json` carries each with a
+`_note`.
 
 The rows we did **not** re-run are the MS-TCN and ProTAS baselines; those come
 from the ProTAS codebase, not this one.
@@ -205,6 +264,7 @@ the rule off. They apply to one recipe (oatmeal) and are inert elsewhere.
 ```
 run.py                       config-driven local runner
 configs/egoper.json          the published EgoPER settings
+configs/gtea.json            the GTEA settings (four splits, --split 1..4)
 vidparse/
   parse.py                   online boundary detection + graph-constrained beam search
   prototypes.py              k-means action prototypes
@@ -216,6 +276,8 @@ vidparse/
   segmentation_metrics.py    Acc / Edit / F1@k
   evaluate.py                per-recipe and overall report
 scripts/extract_maf_features.py
+scripts/convert_gtea_to_json.py  GTEA labels -> the annotation format the pipeline reads
+scripts/gtea_4fold.py        all four GTEA splits and their mean
 tests/test_pipeline.py       kernel shape, novelty peaks, config completeness
 ```
 

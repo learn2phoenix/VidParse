@@ -1,0 +1,93 @@
+{
+  "_note": "GTEA, the 4 standard leave-one-subject-out splits (run each with --split 1..4; scripts/gtea_4fold.py runs all four and averages). The method of the paper, as on EgoPER: k-means centroids, cosine matching over HOD-masked frames. 4-split mean at beam_width 10: Acc 82.66, Edit 89.33, F1@{.1,.25,.5} 87.56 / 85.08 / 74.03; per split Acc 89.51 / 70.90 / 85.92 / 84.29.",
+  "dataset": "gtea",
+  "fps": 15.0,
+  "recipes": [
+    "Cheese",
+    "Coffee",
+    "CofHoney",
+    "Hotdog",
+    "Pealate",
+    "Peanut",
+    "Tea"
+  ],
+  "output_dir": "./runs/gtea/split{split}",
+  "distance_metric": "cosine",
+  "drop_penalty": 0.1,
+  "data": {
+    "root": "/path/to/GTEA",
+    "annotations": "gtea.json",
+    "features": ".",
+    "detections": "hod",
+    "videos": "Videos",
+    "train_list": "splits/train.split{split}.bundle",
+    "test_list": "splits/test.split{split}.bundle"
+  },
+  "features": {
+    "name": "feats_dinov2_hod_enclosed_15fps",
+    "_backbone": "DINOv2 ViT-L/14, patch tokens averaged inside the hand-object interaction box (Manipulation-Anchored Features), at the native 15 fps"
+  },
+  "boundary": {
+    "method": "tsme",
+    "kernel_seconds": 1.0,
+    "peak_height": 5.0,
+    "min_distance": 10,
+    "_note": "1.0 s x 15 fps = a 15-frame kernel. The paper text says L = 10 frames; 15 is what produced the paper's GTEA numbers, and 10 drops the 4-split Acc to 66.5. peak_height and min_distance are the GTEA values of the paper code."
+  },
+  "prototypes": {
+    "num_clusters": 3,
+    "proto_type": "kmeans",
+    "micro": true,
+    "micro_duration_seconds": 1.5,
+    "micro_stride_seconds": 0.5,
+    "conf_thresh": 0.75,
+    "_note": "k = 3 centroids per action (the paper's GTEA setting; each recipe has 3 training videos per split). Micro-prototype windows are 1.5 s / 0.5 s stride as in the paper; a centroid is a single vector, so each yields one micro-prototype. seed is the k-means seed.",
+    "seed": 42
+  },
+  "scoring": {
+    "k": 8,
+    "avg_top_n": 1,
+    "segment_duration": 1.5,
+    "conf_thresh": 0.75
+  },
+  "decoding": {
+    "use_graph": true,
+    "transition_weight": 0,
+    "duration_weight": 0,
+    "beam_width": 10,
+    "segment_duration": 1.5,
+    "blank_penalty": 100,
+    "continuation_bonus": 0.0,
+    "continuation_penalty": 0.0,
+    "short_duration_penalty": 0.0,
+    "temporal_offset_penalty": 0.0,
+    "transition_penalty": 0.0,
+    "good_match_sigma": 1.0,
+    "continuation_sigma_multiplier": 1,
+    "cost_function": "raw",
+    "pruning_metric": "ranking_score",
+    "ignore_history": false,
+    "force_distinct_actions": true,
+    "mask_lambda": 1.0,
+    "bg_alpha": 0.0,
+    "conf_thresh": 0.75,
+    "fill_gap": 1.0,
+    "min_duration": 1.0,
+    "bg_suppress_trigger": "None",
+    "bg_suppress_trigger_count": 1,
+    "max_graph_hops": 1,
+    "allow_skipping": false,
+    "prereq_miss_penalty": 1.0,
+    "bridge_start": null,
+    "bridge_end": null,
+    "bridge_fill": null,
+    "max_segment_duration": null,
+    "_note": "beam_width 10, as on EgoPER (the paper lists 5 for GTEA, which gives a 4-split Acc of 80.20). The five penalty terms are 0.0, as in every published run. bg_suppress_trigger is the literal string 'None' the paper's GTEA run passed: it names no GTEA action, so the rule never fires. The EgoPER microwave bridge is off."
+  },
+  "eval": {
+    "ignore_action": "BG"
+  },
+  "analyzers": {
+    "ignore_action": "BG"
+  }
+}

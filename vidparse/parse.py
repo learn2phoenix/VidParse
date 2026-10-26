@@ -404,7 +404,7 @@ class OnlineTSMEdgeDetector:
             # find_peaks handles distance inside 'scores_arr', but we must
             # also respect distance relative to the *previously emitted* boundary
             # which might be outside the current lookback window.
-            if (found_frame - self.last_emitted_boundary) < 20:
+            if (found_frame - self.last_emitted_boundary) < self.min_distance:
                 continue
             
             # If valid:
