@@ -216,6 +216,16 @@ td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .mark{font-size:19px;font-weight:700;line-height:1;font-family:var(--sans)}
 .mark.y{color:#0CA678}
 .mark.n{color:#9AA5B1}
+/* Correction notices: the slim one under the badges points at the full note in Results. */
+.erratum{max-width:760px;margin:22px auto 0;padding:12px 18px;border:1px solid #F3D3B8;
+  border-left:4px solid var(--hot);border-radius:10px;background:#FFF7F0;color:var(--body);
+  font-size:15.5px;text-align:left}
+.erratum b{color:var(--ink)}
+.note{margin:0 0 22px;padding:16px 20px;border:1px solid #F3D3B8;border-left:4px solid var(--hot);
+  border-radius:10px;background:#FFF7F0;color:var(--body)}
+.note p{margin:0}
+.note p + p{margin-top:10px}
+.note code{font-family:var(--mono);font-size:.85em}
 
 pre{background:var(--tint);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;
   overflow-x:auto;font-family:var(--mono);font-size:14px;line-height:1.7;margin:0;color:var(--body)}
@@ -246,6 +256,9 @@ footer{padding:40px 0 64px;border-top:1px solid var(--rule);color:var(--muted);f
       <a class="badge" href="https://github.com/robert80203/EgoPER_official">EgoPER Data</a>
       <a class="badge" href="#bibtex">BibTeX</a>
     </div>
+    <p class="erratum"><b>Correction, October 2026.</b> The GTEA results in the paper's Table 1
+    are from one of the four standard splits, while the baselines beside them average all four.
+    <a href="#gtea">Corrected four-split GTEA results &rarr;</a></p>
   </div>
 </header>
 
@@ -401,6 +414,23 @@ footer{padding:40px 0 64px;border-top:1px solid var(--rule);color:var(--muted);f
       </table>
     </div>
 
+    <h2 id="gtea" style="margin-top:42px">GTEA</h2>
+    <p class="lede">The same metrics on GTEA, averaged over its four standard leave-one-subject-out
+    splits (7 test videos each). These replace the paper's split-1 numbers; see the
+    <a href="#correction">correction note</a> at the end of this page.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Method</th><th>Inference</th><th>Train-free</th>
+          <th>Acc</th><th>Edit</th><th>F1@0.1</th><th>F1@0.25</th><th>F1@0.5</th></tr></thead>
+        <tbody>
+          <tr><td>MS-TCN</td><td><span class="tag">offline</span></td><td><span class="mark n">&#10007;</span></td><td class="num">79.35</td><td class="num">84.46</td><td class="num">86.54</td><td class="num">83.79</td><td class="num">71.86</td></tr>
+          <tr class="split"><td>MS-TCN</td><td><span class="tag">online</span></td><td><span class="mark n">&#10007;</span></td><td class="num">47.28</td><td class="num">60.26</td><td class="num">66.75</td><td class="num">60.12</td><td class="num">40.29</td></tr>
+          <tr><td>ProTAS</td><td><span class="tag">online</span></td><td><span class="mark n">&#10007;</span></td><td class="num">73.19</td><td class="num">71.81</td><td class="num">72.89</td><td class="num">68.94</td><td class="num">54.87</td></tr>
+          <tr class="ours"><td>VidParse</td><td><span class="tag">online</span></td><td><span class="mark y">&#10003;</span></td><td class="num">82.66</td><td class="num">89.33</td><td class="num">87.56</td><td class="num">85.08</td><td class="num">74.03</td></tr>
+        </tbody>
+      </table>
+    </div>
+
     <h2 style="margin-top:42px">Feature comparison</h2>
     <p class="lede">Every row uses the same decoder and differs only in the features. Restricting
     the pooling to the interaction box helps more than either a larger backbone or a
@@ -475,6 +505,21 @@ footer{padding:40px 0 64px;border-top:1px solid var(--rule);color:var(--muted);f
   archivePrefix = {arXiv},
   primaryClass  = {cs.CV}
 }</pre>
+  </div>
+</section>
+
+<section id="correction">
+  <div class="wrap">
+    <h2>Correction to the GTEA results</h2>
+    <div class="note">
+      <p>The GTEA row for VidParse in the paper's Table 1 (Acc / Edit / F1@{0.1, 0.25, 0.5} =
+      89.1 / 87.4 / 91.9 / 89.9 / 80.5) was computed on split 1 alone, while the baseline rows beside
+      it are averages over all four splits. The two were not comparable, and that was our mistake.
+      The <a href="#gtea">GTEA table</a> above gives VidParse averaged over the same four splits.</p>
+      <p>That row comes from the released code (<code>configs/gtea.json</code>), which follows the
+      method as the paper's text describes it, matching by cosine distance against k-means centroids,
+      with the beam width of 10 that the paper uses on EgoPER.</p>
+    </div>
   </div>
 </section>
 
